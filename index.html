@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIH Internal Round 2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --saffron: #FF9933;
+            --white: #FFFFFF;
+            --green: #138808;
+            --navy: #000080;
+            --light-blue: #E3F2FD;
+            --text-primary: #1E1E2A;
+            --text-secondary: #4A4A5A;
+            --border: #E0E0E0;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f5f7fa 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Slide Styles */
+        .slide {
+            display: none;
+            min-height: 100vh;
+            padding: 60px 40px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 50px;
+            max-width: 800px;
+        }
+
+        .slide-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--navy);
+            position: relative;
+            display: inline-block;
+        }
+
+        .slide-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, var(--saffron), var(--green));
+            border-radius: 2px;
+        }
+
+        .slide-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-top: 25px;
+            font-weight: 400;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+            border-top: 4px solid var(--saffron);
+            border-bottom: 4px solid var(--green);
+            transition: var(--transition);
+            height: 100%;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-5px);
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .timeline-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .round-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .round-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .round-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .date-badge {
+            display: inline-block;
+            background: rgba(19, 136, 8, 0.1);
+            color: var(--green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        /* Criteria Grid */
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .criteria-card {
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .criteria-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .criteria-number {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .criteria-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* NEW: Icon Navigation */
+        .icon-navigation {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .nav-icon-btn {
+            pointer-events: auto;
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--navy);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-icon-btn:hover {
+            background: var(--navy);
+            color: white;
+            transform: translateY(-2px) scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Special Elements */
+        .important-dates {
+            background: rgba(255, 153, 51, 0.08);
+            border-left: 4px solid var(--saffron);
+            border-right: 4px solid var(--green);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .date-highlight {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Side by side tips section */
+        .tips-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tips-section {
+            background: rgba(19, 136, 8, 0.08);
+            border-left: 4px solid var(--green);
+            border-radius: 8px;
+            padding: 25px;
+            height: 100%;
+        }
+
+        .tips-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tip-item {
+            margin: 12px 0;
+            padding-left: 28px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .tip-item::before {
+            content: '•';
+            position: absolute;
+            left: 12px;
+            color: var(--saffron);
+            font-weight: bold;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--saffron), var(--white), var(--green));
+            width: 0%;
+            transition: width 0.3s ease;
+            z-index: 1001;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: -60px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .footer.show {
+            bottom: 0;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .slide {
+                padding: 50px 30px;
+            }
+            
+            .slide-title {
+                font-size: 2.4rem;
+            }
+            
+            .timeline-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 20px;
+            }
+            
+            .slide-title {
+                font-size: 2rem;
+            }
+            
+            .criteria-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-icon-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .slide-title {
+                font-size: 1.8rem;
+            }
+            
+            .slide-subtitle {
+                font-size: 1rem;
+            }
+            
+            .tips-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-icon-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .icon-navigation {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- NEW: Icon Navigation -->
+    <div class="icon-navigation">
+        <button class="nav-icon-btn" id="prevBtn">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <button class="nav-icon-btn" id="nextBtn">
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- Slide 1: Title Slide -->
+    <div class="slide active">
+        <div class="slide-header">
+            <h1 class="slide-title">SIH Internal Round 2025</h1>
+            <p class="slide-subtitle">Smart India Hackathon | September 18-19, 2025</p>
+        </div>
+        <div class="important-dates animate-in">
+            <div class="date-highlight">
+                <i class="fas fa-calendar-alt"></i>
+                September 18-19, 2025
+            </div>
+            <p>Join us for an exciting journey of innovation and problem-solving</p>
+        </div>
+    </div>
+
+    <!-- Slide 2: Timeline Overview -->
+    <div class="slide">
+        <div class="slide-header">
+            <h2 class="slide-title">Event Timeline</h2>
+            <p class="slide-subtitle">A structured pathway from inception to results</p>
+        </div>
+        <div class="timeline-container">
+            <div class="timeline-card card animate-in">
+                <div class="round-number">
+                    <i class="fas fa-flag"></i>
+                    LAUNCH
+                </div>
+                <h3 class="round-title">Kickoff</h3>
+                <p class="round-description">
+                    Official start of internal hackathon round by senior authorities
+                </p>
+                <span class="date-badge">September 18</span>
+            </div>
+            
+            <div class="timeline-card card animate-in delay-1">
+                <div class="round-number">
+                    <i class="fas fa-1"></i>
+                    ROUND 
+                </div>
+                <h3 class="round-title">Initial Evaluation</h3>
+                <p class="round-description">
+                    Evaluation of teams by judges based on evaluation criteria (PPT Presentation)
+                </p>
+                <span class="date-badge">September 18</span>
+            </div>
+            
+            <div class="timeline-card card animate-in delay-2">
+                <div class="round-number">
+                    <i class="fas fa-2"></i>
+                    ROUND 
+                </div>
+                <h3 class="round-title">Implementation Focus</h3>
+                <p class="round-description">
+                    Teams evaluated on their implementation of solutions for specific problem statements (Top 25 teams)
+                </p>
+                <span class="date-badge">September 18</span>
+            </div>
+            
+            <div class="timeline-card card animate-in delay-3">
+                <div class="round-number">
+                    <i class="fas fa-3"></i>
+                    ROUND 
+                </div>
+                <h3 class="round-title">Final Presentation</h3>
+                <p class="round-description">
+                    Overall presentation of top 25 teams in front of judges and senior authorities
+                </p>
+                <span class="date-badge">September 19</span>
+            </div>
+            
+            <div class="timeline-card card animate-in delay-4">
+                <div class="round-number">
+                    <i class="fas fa-4"></i>
+                    ROUND 
+                </div>
+                <h3 class="round-title">Grand Finale</h3>
+                <p class="round-description">
+                    Overall presentation of top 15 teams in front of judges and senior authorities
+                </p>
+                <span class="date-badge">September 19</span>
+            </div>
+            
+            <div class="timeline-card card animate-in delay-5">
+                <div class="round-number">
+                    <i class="fas fa-trophy"></i>
+                    CONCLUSION
+                </div>
+                <h3 class="round-title">Results & Recognition</h3>
+                <p class="round-description">
+                    Official end of internal hackathon round and appreciation and nomination of top 15 teams
+                </p>
+                <span class="date-badge">September 19</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Evaluation Criteria -->
+    <div class="slide">
+        <div class="slide-header">
+            <h2 class="slide-title">Evaluation Criteria</h2>
+            <p class="slide-subtitle">Key aspects that will be assessed during the competition</p>
+        </div>
+        <div class="criteria-grid">
+            <div class="criteria-card card animate-in">
+                <div class="criteria-number">01</div>
+                <h3 class="criteria-title">
+                    <i class="fas fa-bullseye"></i>
+                    Problem Understanding & Relevance
+                </h3>
+                <p class="round-description">How well you understand the problem and the relevance of your solution</p>
+            </div>
+            
+            <div class="criteria-card card animate-in delay-1">
+                <div class="criteria-number">02</div>
+                <h3 class="criteria-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Innovation & Creativity
+                </h3>
+                <p class="round-description">The uniqueness and creative approach in your solution</p>
+            </div>
+            
+            <div class="criteria-card card animate-in delay-2">
+                <div class="criteria-number">03</div>
+                <h3 class="criteria-title">
+                    <i class="fas fa-cogs"></i>
+                    Feasibility & Technical Soundness
+                </h3>
+                <p class="round-description">How technically sound and feasible your solution is</p>
+            </div>
+            
+            <div class="criteria-card card animate-in delay-3">
+                <div class="criteria-number">04</div>
+                <h3 class="criteria-title">
+                    <i class="fas fa-rocket"></i>
+                    Implementation Strategy & Prototype
+                </h3>
+                <p class="round-description">Your implementation approach and working prototype</p>
+            </div>
+            
+            <div class="criteria-card card animate-in delay-4">
+                <div class="criteria-number">05</div>
+                <h3 class="criteria-title">
+                    <i class="fas fa-users"></i>
+                    Team Capability & Presentation
+                </h3>
+                <p class="round-description">Team's capability and presentation skills</p>
+            </div>
+            
+            <div class="criteria-card card animate-in delay-5">
+                <div class="criteria-number">06</div>
+                <h3 class="criteria-title">
+                    <i class="fas fa-chart-line"></i>
+                    Impact & Scalability
+                </h3>
+                <p class="round-description">The potential impact and scalability of your solution</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Tips & Guidelines -->
+    <div class="slide">
+        <div class="slide-header">
+            <h2 class="slide-title">Tips for Success</h2>
+            <p class="slide-subtitle">Maximize your chances of winning with these guidelines</p>
+        </div>
+        <div class="tips-container">
+            <div class="tips-section animate-in">
+                <h3 class="tips-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Presentation Tips
+                </h3>
+                <p class="tip-item">Focus on clarity and conciseness in your presentation</p>
+                <p class="tip-item">Demonstrate a working prototype or proof of concept</p>
+                <p class="tip-item">Highlight the unique value proposition of your solution</p>
+                <p class="tip-item">Practice your presentation to ensure smooth delivery</p>
+                <p class="tip-item">Be prepared to answer questions from the judges</p>
+            </div>
+            
+            <div class="tips-section animate-in delay-1">
+                <h3 class="tips-title">
+                    <i class="fas fa-users"></i>
+                    Team Collaboration
+                </h3>
+                <p class="tip-item">Clearly define roles and responsibilities for each team member</p>
+                <p class="tip-item">Leverage each member's strengths and expertise</p>
+                <p class="tip-item">Maintain effective communication throughout the process</p>
+                <p class="tip-item">Practice your presentation as a team to ensure cohesion</p>
+            </div>
+            
+            <div class="tips-section animate-in delay-2">
+                <h3 class="tips-title">
+                    <i class="fas fa-tools"></i>
+                    Technical Excellence
+                </h3>
+                <p class="tip-item">Focus on clean, well-documented code</p>
+                <p class="tip-item">Implement proper error handling and edge cases</p>
+                <p class="tip-item">Use version control effectively (Git)</p>
+                <p class="tip-item">Test your solution thoroughly before presentation</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Final Slide -->
+    <div class="slide">
+        <div class="slide-header">
+            <h2 class="slide-title">Ready to Innovate?</h2>
+            <p class="slide-subtitle">Let's build solutions that make a difference</p>
+        </div>
+        
+        <div class="important-dates animate-in">
+            <div class="date-highlight">
+                <i class="fas fa-flag"></i>
+                Important Reminders
+            </div>
+            <p>Registration ends on 15th September, 2025</p>
+            <p>Internal Hackathon Round will be on 18th & 19th September, 2025</p>
+        </div>
+        
+        <div class="tips-container">
+            <div class="tips-section animate-in delay-1">
+                <h3 class="tips-title">
+                    <i class="fas fa-trophy"></i>
+                    What Top Teams Will Receive ?
+                </h3>
+                <p class="tip-item">Certificate of Participation</p>
+                <p class="tip-item">Mentorship for national round</p>
+                <p class="tip-item">Priority access to resources</p>
+                <p class="tip-item">Recognition by institute</p>
+            </div>
+            
+            <div class="tips-section animate-in delay-2">
+                <h3 class="tips-title">
+                    <i class="fas fa-question-circle"></i>
+                    Need Help?
+                </h3>
+                <p class="tip-item">Yash Oza: 95109 02858</p>
+                <p class="tip-item">Man Gajjar: 99132 85859</p>
+                <p class="tip-item">Yug Patel: 95123 66115</p>
+                <p class="tip-item">Deep Daswani: 87996 82596</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer" id="footer">
+        SIH Internal Round 2025 | September 18-19, 2025
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressBar = document.getElementById('progressBar');
+            const footer = document.getElementById('footer');
+            
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            
+            // Update slide counter and progress
+            function updateSlideCounter() {
+                progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+                
+                // Show footer on last slide
+                if (currentSlide === totalSlides - 1) {
+                    footer.classList.add('show');
+                } else {
+                    footer.classList.remove('show');
+                }
+            }
+            
+            // Navigate to specific slide
+            function goToSlide(n) {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (n + totalSlides) % totalSlides;
+                slides[currentSlide].classList.add('active');
+                updateSlideCounter();
+            }
+            
+            // Next and previous buttons
+            nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+            prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    goToSlide(currentSlide + 1);
+                } else if (e.key === 'ArrowLeft') {
+                    goToSlide(currentSlide - 1);
+                }
+            });
+            
+            // Swipe support for mobile devices
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            document.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    goToSlide(currentSlide + 1); // Swipe left
+                }
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    goToSlide(currentSlide - 1); // Swipe right
+                }
+            }
+            
+            // Initialize
+            updateSlideCounter();
+            
+            // Add scroll effect to elements
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.card, .important-dates, .tips-section').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
